@@ -1,10 +1,10 @@
 <template>
- <main>
-   <nuxt-layout>
-
-   </nuxt-layout>
- </main>
+  <div>
+    <v-app>
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </v-app>
+  </div>
 </template>
-<script setup lang="ts">
-import main from "~/components/main.vue";
-</script>
+<script setup lang="ts"></script>
