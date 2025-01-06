@@ -2,18 +2,16 @@
   <v-btn style="position: relative;" variant="plain"> open
     <input class="input" type="file" @change="handleFileInput" accept="video/*" />
   </v-btn>
-  <div>
+  <div class="relative overflow-hidden h-full">
     <!-- File Input for Video Selection -->
 
     <!-- Video.js Player Container -->
     <video
       ref="videoPlayer"
       id="videoPlayer"
-      class="video-js large vjs-default-skin"
+      class="vjs-matrix video-js "
       controls
       preload="auto"
-      width="640"
-      height="360"
     ></video>
   </div>
 </template>
@@ -22,11 +20,10 @@ import videojs from "video.js";
 import "video.js/dist/video-js.css";
 const videoPlayer = ref(null); // Reference to the <video> element
 let player = null; // Video.js player instance
-
 // Handle file input change
+const showPlayer = ref(false)
 const handleFileInput = (event) => {
   const file = event.target.files[0];
-
   if (file) {
     const fileURL = URL.createObjectURL(file);
 
@@ -38,6 +35,7 @@ const handleFileInput = (event) => {
       initializePlayer(fileURL, file.type);
     }
   }
+  showPlayer.value = true;
 };
 
 // Initialize the Video.js player
@@ -47,7 +45,6 @@ const initializePlayer = (src, type) => {
       autoplay: false,
       controls: true,
       responsive: true,
-      fluid: true,
       sources: [{ src, type }],
     });
 
@@ -66,8 +63,6 @@ onMounted(() => {
     player = videojs(videoPlayer.value, {
       autoplay: false,
       controls: true,
-      responsive: true,
-      fluid: true,
     });
   } else {
     console.error("Video element not found on mount.");
@@ -83,10 +78,15 @@ onBeforeUnmount(() => {
 </script>
 <style scoped>
 /* Custom styles for the player */
-.video-js {
-  height: 10px;
+.vjs-matrix.video-js {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
 }
 .input{
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
