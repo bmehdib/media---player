@@ -1,5 +1,7 @@
 <template>
-  <input class="input" type="file" @change="handleFileInput" accept="video/*" />
+  <v-btn style="position: relative;" variant="plain"> open
+    <input class="input" type="file" @change="handleFileInput" accept="video/*" />
+  </v-btn>
   <div>
     <!-- File Input for Video Selection -->
 
@@ -84,11 +86,11 @@ onBeforeUnmount(() => {
 .video-js {
   height: 10px;
 }
-input[type="file"] {
-  display: none;
-}
 .input{
-  position: absolute;
-  top: 10px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
 }
 </style>
