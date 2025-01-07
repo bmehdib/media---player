@@ -1,6 +1,6 @@
 <template>
   <v-btn style="position: relative;" variant="plain"> open
-    <input class="input" type="file" @change="handleFileInput" accept="video/*" />
+    <input class="input" type="file" @change="handleFileInput" accept="video" />
   </v-btn>
   <div class="relative overflow-hidden h-full">
     <!-- File Input for Video Selection -->
@@ -29,7 +29,7 @@ const handleFileInput = (event) => {
 
     if (player) {
       // Update the player's source with the new file URL
-      player.src({ src: fileURL, type: file.type });
+      player.src({ src: fileURL, type: 'video/webm' });
     } else {
       // Initialize Video.js player if not already done
       initializePlayer(fileURL, file.type);
