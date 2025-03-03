@@ -1,9 +1,16 @@
 <template>
-  <v-btn style="position: relative;" variant="plain"> open
+  <v-btn style="position: relative;" variant="plain">
+    open
     <input class="input" type="file" @change="handleFileInput" accept="video" />
   </v-btn>
-  <v-btn  v-if="showPlayer" style="position: relative;" variant="plain">Subtitle
-    <input class="input" type="file" @change="handleSubtitles" accept=".vtt,.srt" />
+  <v-btn v-if="showPlayer" style="position: relative;" variant="plain"
+    >Subtitle
+    <input
+      class="input"
+      type="file"
+      @change="handleSubtitles"
+      accept=".vtt,.srt"
+    />
   </v-btn>
   <div class="relative overflow-hidden h-full">
     <!-- File Input for Video Selection -->
@@ -21,15 +28,15 @@
 <script setup>
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
+
 const videoPlayer = ref(null); // Reference to the <video> element
 let player = null; // Video.js player instance
 // Handle file input change
 const showPlayer = ref(false)
-const handleFileInput = (event) => {
+const handleFileInput = async(event) => {
   const file = event.target.files[0];
   if (file) {
     const fileURL = URL.createObjectURL(file);
-
     if (player) {
       // Update the player's source with the new file URL
       player.src({ src: fileURL, type: 'video/webm' });
@@ -39,6 +46,26 @@ const handleFileInput = (event) => {
     }
   }
   showPlayer.value = true;
+  const formData = new FormData();
+  formData.append("video", file);
+
+  try {
+    const response = await fetch("http://localhost:5000/extract-subtitles", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+    console.log("Server response:", data); // Debug log
+
+    if (data.success) {
+      addSubtitlesToPlayer(data.subtitlePath);
+    } else {
+      console.error("Subtitle extraction failed:", data.error || "Unknown error");
+    }
+  } catch (error) {
+    console.error("Error sending video:", error);
+  }
 };
 function convertSRTtoVTT(srt) {
       const vtt = 'WEBVTT\n\n' + srt
@@ -65,6 +92,7 @@ const initializePlayer = (src, type) => {
   } else {
     console.error("Video element not found.");
   }
+
 };
 function handleSubtitles(event){
   const file = event.target.files[0];
@@ -133,6 +161,21 @@ onBeforeUnmount(() => {
     player.dispose();
   }
 });
+const addSubtitlesToPlayer = (data) => {
+  const subtitleURL = data; // Convert path to full URL
+
+  console.log("Adding subtitles:", subtitleURL); // Debugging log
+
+  player.addRemoteTextTrack({
+    src: subtitleURL,
+    kind: "subtitles",
+    label: "Extracted Subtitles",
+    default: true,
+  });
+
+  // Force Video.js to show subtitles
+  player.textTracks()[0].mode = "showing";
+};
 </script>
 <style scoped>
 /* Custom styles for the player */
